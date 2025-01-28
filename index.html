@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebAR with AR.js</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.7.2/aframe/build/aframe-ar.min.js"></script>
+    <script>
+      AFRAME.registerComponent("ground-placement", {
+        init: function () {
+          var el = this.el;
+          var scene = document.querySelector("a-scene");
+          var cursor = document.querySelector("#cursor");
+
+          // Hit Test API 설정
+          scene.addEventListener("enter-vr", function () {
+            let session = scene.renderer.xr.getSession();
+            if (session) {
+              session.addEventListener("select", function () {
+                let newObject = document.createElement("a-entity");
+                newObject.setAttribute("gltf-model", "#model");
+                newObject.setAttribute(
+                  "position",
+                  cursor.getAttribute("position")
+                );
+                newObject.setAttribute("scale", "0.5 0.5 0.5");
+                scene.appendChild(newObject);
+              });
+            }
+          });
+        },
+      });
+    </script>
+  </head>
+  <body style="margin: 0; overflow: hidden">
+    <a-scene embedded arjs="sourceType: webcam;" ground-placement>
+      <!-- 바닥 감지 커서 -->
+      <a-entity
+        id="cursor"
+        geometry="primitive: circle; radius: 0.1"
+        material="color: yellow; opacity: 0.5"
+        position="0 0 0"
+      ></a-entity>
+
+      <!-- 3D 모델 -->
+      <a-assets>
+        <a-asset-item
+          id="model"
+          src="https://cdn.glitch.global/12345/sample-model.glb"
+        ></a-asset-item>
+      </a-assets>
+    </a-scene>
+  </body>
+</html>
